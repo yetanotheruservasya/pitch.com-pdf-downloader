@@ -7,4 +7,4 @@ Install the requirements and run the script via:
 python pitch-to-pdf.py URL [resolution]
 ```
 
-Valid resolutions are HD, 4K and 8K.
+Valid resolutions are HD, 4K and 8K. Default resolution is 4K.
