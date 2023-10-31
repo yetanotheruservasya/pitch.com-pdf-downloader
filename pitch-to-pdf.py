@@ -1,3 +1,9 @@
+# TODO:
+# hubspot
+# box.com
+# others ... ?
+
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -11,7 +17,7 @@ import sys
 
 # Selenium settings to disable logs and run headless
 chrome_options = Options()
-chrome_options.add_argument('--headless')
+# chrome_options.add_argument('--headless')
 chrome_options.add_argument('--log-level=3')
 
 
@@ -38,21 +44,58 @@ chrome_options.add_argument(res)
 # Loading page, wait 1s for page to load
 driver = webdriver.Chrome(options = chrome_options)
 driver.get(url)
-time.sleep(2)
-
-# Finding number of slides and the button for the next slide
-n_slides = len(driver.find_elements(By.CLASS_NAME, 'dash'))
-next_btn = driver.find_elements(By.CLASS_NAME, 'player-v2--button')[1]
+time.sleep(5)
 
 # Taking a screenshot of all slides
-png_slides = []
-print('\nScraping slides from pitch.com...')
-for n in tqdm(range(n_slides)):
-    slide = driver.find_element(By.CLASS_NAME, 'slide-wrapper')
-    png_slides.append(slide.screenshot_as_png)
-    if n < n_slides - 1:
-        next_btn.click()
-print('Slides scraped!')
+def scrape_slides(n_slides, next_btn, find_slide_fun, find_slide_params):
+
+    png_slides = []
+    print('\nScraping slides...')
+    for n in tqdm(range(n_slides)):
+        slide = find_slide_fun(*find_slide_params)
+        png_slides.append(slide.screenshot_as_png)
+        if n < n_slides - 1:
+            # Use JS in case it's hidden
+            driver.execute_script("arguments[0].click();", next_btn)
+            time.sleep(1.5)
+    print('Slides scraped!')
+    return png_slides
+
+
+if 'pitch.com' in url:
+    n_slides = len(driver.find_elements(By.CLASS_NAME, 'dash'))
+    next_btn = driver.find_elements(By.CLASS_NAME, 'player-v2--button')[1]
+    png_slides = scrape_slides(n_slides, next_btn, driver.find_element, (By.CLASS_NAME, 'slide-wrapper'))
+
+elif 'canva.com' in url:
+    
+    # Accept cookies
+    buttons = driver.find_elements(By.TAG_NAME, 'button')
+    for b in buttons:
+        if 'Accept' in b.text:
+            b.click()
+            time.sleep(1)
+            break
+
+    n_slides = driver.find_elements(By.XPATH, '//*[@aria-valuemax]')[0].get_property('ariaValueMax')
+    n_slides = int(n_slides)
+
+    # Hiding the footer & header (otherwise visible in slide)
+    footer = driver.find_elements(By.TAG_NAME, 'footer')[0]
+    header = driver.find_elements(By.TAG_NAME, 'header')[0]
+    driver.execute_script("arguments[0].style.opacity = 0;", footer)
+    driver.execute_script("arguments[0].style.opacity = 0;", header)
+
+    next_btn = driver.find_elements(By.TAG_NAME, 'button')[4]
+    if '/' in next_btn.text:
+        next_btn = driver.find_elements(By.TAG_NAME, 'button')[5]
+    if next_btn.text != '':
+        print('Found wrong next button...')
+        print(next_btn.text)
+        raise Exception('Wrong next button!')
+    
+    png_slides = scrape_slides(n_slides, next_btn, driver.find_element, (By.XPATH, '//*[contains(@style, "translate")]'))
+
 
 # Loading from memory and converting RGBA to RGB
 def foo(png):
