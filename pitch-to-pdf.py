@@ -1,6 +1,7 @@
 # TODO:
 # hubspot
 # box.com
+# google drive : https://sites.google.com/a/gooapps.edu.vn/app-learning-center/tips-library/docs-tips/prevent-others-from-downloading-printing-and-copying-shared-drive-files
 # others ... ?
 
 
@@ -63,8 +64,22 @@ def scrape_slides(n_slides, next_btn, find_slide_fun, find_slide_params):
 
 
 if 'pitch.com' in url:
+
+    # Cookie accept - do not accept tracking
+    btn = driver.find_elements(By.XPATH, '//button[@type="text"]')
+    if len(btn) > 0:
+        btn = btn[0]
+        btn.click()
+        time.sleep(1)
+        no_tracking = driver.find_elements(By.XPATH, '//input[@name="engagement"]')[0]
+        no_tracking.click()
+        time.sleep(1)
+        confirm = driver.find_elements(By.XPATH, '//button[@type="submit"]')[0]
+        confirm.click()
+        time.sleep(1)
+
     n_slides = len(driver.find_elements(By.CLASS_NAME, 'dash'))
-    next_btn = driver.find_elements(By.CLASS_NAME, 'player-v2--button')[1]
+    next_btn = driver.find_elements(By.CLASS_NAME, 'ng-player-v2--button')[1]
     png_slides = scrape_slides(n_slides, next_btn, driver.find_element, (By.CLASS_NAME, 'slide-wrapper'))
 
 elif 'canva.com' in url:
