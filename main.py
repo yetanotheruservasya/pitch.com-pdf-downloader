@@ -1,23 +1,25 @@
-import sys
+import argparse
 from utils.slide_downloader import SlideDownloader
 
 if __name__ == '__main__':
 
+    # Parsing input args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('url', help = 'The url to download the slides from')
+    parser.add_argument('-r', '--resolution', help = 'The slide resolution, HD, 4K or 8K allowed', default = '4K')
+    parser.add_argument('--skip-ocr', action = 'store_true', dest = 'skip_ocr', help = 'Disable OCR')
+    args = parser.parse_args()
 
-    # Args from console
-    if len(sys.argv) == 1:
-        raise Exception('Missing url parameter')
-    url = sys.argv[1]
-    if len(sys.argv) > 2:
-        resolution = sys.argv[2]
-    else:
-        resolution = '4K'
+    # Saving the presentation as a PDF
+    sd = SlideDownloader(args.resolution)
+    pdf_path = sd.download(args.url)
 
-    sd = SlideDownloader(resolution)
-
-    pdf_path = sd.download(url)
-
-    # testing: https://pitch.com/public/babe4b9d-f535-4b8d-b206-c12af886bdb0
+    # Running ocr. 
+    if not args.skip_ocr:
+        print('\nRunning OCR... (disable with the flag --skip-ocr)')
+        import ocrmypdf
+        ocrmypdf.ocr(pdf_path, pdf_path, deskew = True) 
+        print('OCR finished!')
 
 
     
