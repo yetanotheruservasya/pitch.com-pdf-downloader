@@ -33,7 +33,7 @@ class SlideDownloader:
         self.driver = webdriver.Chrome(options = chrome_options)
     
 
-    def _scrape_slides(self, n_slides, next_btn, slide_selector):
+    def _scrape_slides(self, n_slides, next_btn, slide_selector, pitch_dot_com = False):
         '''
         Takes a screenshot of all slides and returns a list of pngs
 
@@ -45,12 +45,21 @@ class SlideDownloader:
         png_slides = []
         print('\nScraping slides...')
         for n in tqdm(range(n_slides)):
+
+            # Animations in pitch.com ...
+            if pitch_dot_com:
+                while not sources.pitch_at_slide_end(self.driver):
+                    self.driver.execute_script("arguments[0].click();", next_btn)
+                    time.sleep(1.5)
+
             slide = self.driver.find_element(*slide_selector)
             png_slides.append(slide.screenshot_as_png)
+
             if n < n_slides - 1:
                 # Use JS in case it's hidden
                 self.driver.execute_script("arguments[0].click();", next_btn)
                 time.sleep(1.5)
+
         print('Slides scraped!')
         return png_slides
     
@@ -62,16 +71,18 @@ class SlideDownloader:
         url = url.lower()
 
         self.driver.get(url)
-        time.sleep(5)
-
+        time.sleep(10)
+        
+        pitch = False
         if 'pitch.com' in url:
             params = sources.get_pitch_params(self.driver)
+            pitch = True
         elif 'canva.com' in url:
             params = sources.get_canva_params(self.driver)
         else:
             raise Exception('URL not supported...')
         
-        png_slides = self._scrape_slides(params['n_slides'], params['next_btn'], params['slide_selector'])
+        png_slides = self._scrape_slides(params['n_slides'], params['next_btn'], params['slide_selector'], pitch_dot_com = pitch)
 
         # Helper: Loading from memory and converting RGBA to RGB
         def _rgba_to_rgb(png):
@@ -86,7 +97,9 @@ class SlideDownloader:
         images = [_rgba_to_rgb(png) for png in tqdm(png_slides)]
         print('Conversion finished!')
 
-        output_path = 'decks/' + self.driver.title + '.pdf'
+        title = ''.join([char for char in self.driver.title if char.isalpha()])
+
+        output_path = 'decks/' + title + '.pdf'
 
         print('\nSaving deck as "' + output_path + '"...')
         images[0].save(

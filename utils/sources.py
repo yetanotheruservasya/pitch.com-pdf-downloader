@@ -59,7 +59,10 @@ def get_pitch_params(driver):
         time.sleep(1)
     
     # Deleting the popup shown at the end of the presentation
-    driver.execute_script("document.getElementsByClassName('player-branding-popover')[0].remove();")
+    try:
+        driver.execute_script("document.getElementsByClassName('player-branding-popover')[0].remove();")
+    except Exception:
+        print('Could not remove branding popover...')
 
     n_slides = len(driver.find_elements(By.CLASS_NAME, 'dash'))
 
@@ -76,3 +79,13 @@ def get_pitch_params(driver):
     )
 
     return params
+
+# Check if we're at the end of the current slide (gradually adding elements)
+def pitch_at_slide_end(driver):
+
+    current_dash = driver.find_element(By.CSS_SELECTOR, '.dash.selected [aria-valuenow]')
+
+    aria_valuenow = current_dash.get_attribute('aria-valuenow')
+
+    return aria_valuenow == '100'
+
