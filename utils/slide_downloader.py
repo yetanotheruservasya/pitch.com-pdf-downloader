@@ -89,7 +89,11 @@ class SlideDownloader:
             img = Image.open(BytesIO(png))
             img.load()
             background = Image.new('RGB', img.size, (255, 255, 255))
-            background.paste(img, mask = img.split()[3])
+
+            if img.mode == 'RGBA':
+                background.paste(img, mask = img.split()[3])
+            else:
+                background.paste(img)
             return background
 
         # Saving the screenshots as a PDF using Pillow
