@@ -20,6 +20,3 @@ if __name__ == '__main__':
         import ocrmypdf
         ocrmypdf.ocr(pdf_path, pdf_path, deskew = True) 
         print('OCR finished!')
-
-
-    

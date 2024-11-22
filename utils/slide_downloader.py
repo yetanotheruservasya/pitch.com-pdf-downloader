@@ -114,13 +114,3 @@ class SlideDownloader:
         self.driver.close()
 
         return output_path
-
-
-
-
-
-
-
-
-
-    
