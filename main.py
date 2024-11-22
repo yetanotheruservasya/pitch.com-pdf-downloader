@@ -6,7 +6,7 @@ if __name__ == '__main__':
     # Parsing input args
     parser = argparse.ArgumentParser()
     parser.add_argument('url', help = 'The url to download the slides from')
-    parser.add_argument('-r', '--resolution', help = 'The slide resolution, HD, 4K or 8K allowed', default = '4K')
+    parser.add_argument('-r', '--resolution', help = 'The slide resolution, HD, 4K or 8K allowed', default = 'HD')
     parser.add_argument('--skip-ocr', action = 'store_true', dest = 'skip_ocr', help = 'Disable OCR')
     args = parser.parse_args()
 
