@@ -17,7 +17,11 @@ class SlideDownloader:
         chrome_options = Options()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--log-level=3')
-
+        chrome_options.add_argument('--no-sandbox')  # Это важно для работы в контейнерах
+        chrome_options.add_argument('--disable-dev-shm-usage')  # Отключает использование /dev/shm, что может вызвать проблемы
+        chrome_options.add_argument('--remote-debugging-port=9222')  # Указывает порт для отладки
+        chrome_options.add_argument('--disable-gpu')  # Отключает GPU (не нужно в headless режиме)
+        chrome_options.add_argument('--disable-software-rasterizer')  # Для устранения проблем с графикой
         # Setting resolution
         if resolution == 'HD':
             res = 'window-size=1920,1080'
