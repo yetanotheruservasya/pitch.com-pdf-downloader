@@ -1,3 +1,7 @@
+"""
+Скрипт для загрузки презентаций с сайтов pitch.com и canva.com и сохранения их в формате PDF.
+"""
+
 import argparse
 from utils.slide_downloader import SlideDownloader
 
@@ -9,7 +13,6 @@ if __name__ == '__main__':
     parser.add_argument(
         '-r',
         '--resolution',
-        help = 'The slide resolution,HD, 4K or 8K allowed',
         default = 'HD'
     )
     parser.add_argument(
@@ -22,11 +25,11 @@ if __name__ == '__main__':
 
     # Saving the presentation as a PDF
     sd = SlideDownloader(args.resolution)
-    pdf_path = sd.download(args.url)
+    PDF_PATH = sd.download(args.url)
 
     # Running ocr.
     if not args.skip_ocr:
         print('\nRunning OCR... (disable with the flag --skip-ocr)')
         import ocrmypdf
-        ocrmypdf.ocr(pdf_path, pdf_path, deskew = True)
+        ocrmypdf.ocr(PDF_PATH, PDF_PATH, deskew = True)
         print('OCR finished!')

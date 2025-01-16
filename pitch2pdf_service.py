@@ -1,3 +1,7 @@
+"""
+Сервис для загрузки слайдов с сайтов pitch.com и canva.com и сохранения их в формате PDF.
+"""
+
 import os
 from flask import Flask, request, jsonify, send_file
 import ocrmypdf
@@ -11,6 +15,9 @@ os.makedirs(downloads_dir, exist_ok=True)
 
 @app.route('/download', methods=['POST'])
 def download_slides():
+    """
+    Обрабатывает запрос на скачивание слайдов, выполняет их загрузку и возвращает PDF файл.
+    """
     data = request.get_json()
 
     # Проверка, что в запросе есть URL
@@ -43,12 +50,17 @@ def download_slides():
             return jsonify({'error': f'File not created: {pdf_path}'}), 500
 
     except IndexError:
-        return jsonify({'error': 'Failed to process document: IndexError - list index out of range'}), 500
+        return jsonify(
+            {'error': 'Failed to process document: IndexError - list index out of range'}
+            ), 500
     except (ValueError, IOError, RuntimeError) as e:
         return jsonify({'error': f'Failed to process document: {str(e)}'}), 500
 
 @app.route('/cleanup', methods=['POST'])
 def cleanup_files():
+    """
+    Обрабатывает запрос на очистку каталога со скачанными файлами.
+    """
     try:
         # Очистка всех файлов в каталоге decks
         for filename in os.listdir(downloads_dir):

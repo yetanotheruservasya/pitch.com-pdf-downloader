@@ -1,3 +1,7 @@
+"""
+Тестовый скрипт для проверки сервиса загрузки слайдов и очистки файлов.
+"""
+
 import requests
 
 # Адрес вашего сервиса
@@ -10,7 +14,7 @@ download_data = {
     "skip_ocr": True
 }
 
-response = requests.post(f"{BASE_URL}/download", json=download_data)
+response = requests.post(f"{BASE_URL}/download", json=download_data, timeout=30)
 
 if response.status_code == 200:
     with open("downloaded_slide.pdf", "wb") as file:
@@ -20,7 +24,7 @@ else:
     print(f"Ошибка: {response.json()}")
 
 # Очистка файлов
-cleanup_response = requests.post(f"{BASE_URL}/cleanup")
+cleanup_response = requests.post(f"{BASE_URL}/cleanup", timeout=30)
 if cleanup_response.status_code == 200:
     print("Очистка файлов выполнена успешно")
 else:

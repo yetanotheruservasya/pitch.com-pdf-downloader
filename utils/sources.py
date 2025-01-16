@@ -1,5 +1,9 @@
-from selenium.webdriver.common.by import By
+"""
+Модуль для получения параметров слайдов с сайтов pitch.com и canva.com.
+"""
 import time
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import JavascriptException
 
 def get_canva_params(driver):
     '''
@@ -29,8 +33,8 @@ def get_canva_params(driver):
     if next_btn.text != '':
         print('Found wrong next button...')
         print(next_btn.text)
-        raise Exception('Wrong next button!')
-    
+        raise ValueError('Wrong next button!')
+
     params = dict(
         n_slides = n_slides,
         next_btn = next_btn,
@@ -57,11 +61,13 @@ def get_pitch_params(driver):
         confirm = driver.find_elements(By.XPATH, '//button[@type="submit"]')[0]
         confirm.click()
         time.sleep(1)
-    
-    # Deleting the popup shown at the end of the presentation
+
     try:
-        driver.execute_script("document.getElementsByClassName('player-branding-popover')[0].remove();")
-    except Exception:
+        driver.execute_script(
+            "document.getElementsByClassName('player-branding-popover')[0].remove();"
+        )
+    except JavascriptException:
+        print('Could not remove branding popover...')
         print('Could not remove branding popover...')
 
     n_slides = len(driver.find_elements(By.CLASS_NAME, 'dash'))
@@ -80,12 +86,13 @@ def get_pitch_params(driver):
 
     return params
 
-# Check if we're at the end of the current slide (gradually adding elements)
 def pitch_at_slide_end(driver):
+    '''
+    Check if we're at the end of the current slide (gradually adding elements)
+    '''
 
     current_dash = driver.find_element(By.CSS_SELECTOR, '.dash.selected [aria-valuenow]')
 
     aria_valuenow = current_dash.get_attribute('aria-valuenow')
 
     return aria_valuenow == '100'
-
