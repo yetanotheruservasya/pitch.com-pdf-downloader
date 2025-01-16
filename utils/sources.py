@@ -76,6 +76,13 @@ def get_pitch_params(driver):
     btns = driver.find_elements(By.CLASS_NAME, 'ng-player-v2--button')
     if len(btns) == 0:
         btns = driver.find_elements(By.CLASS_NAME, 'player-v2--button')
+    
+    if len(btns) < 2:
+        print(f"Buttons found: {len(btns)}")
+        for i, btn in enumerate(btns):
+            print(f"Button {i}: {btn.get_attribute('outerHTML')}")
+        raise IndexError('Failed to find the next button. The list index is out of range.')
+
     next_btn = btns[1]
 
     params = dict(

@@ -22,7 +22,7 @@ class SlideDownloader:
     def __init__(self, resolution):
 
         chrome_options = Options()
-        chrome_options.add_argument('--headless')
+        #chrome_options.add_argument('--headless')
         chrome_options.add_argument('--log-level=3')
         # Это важно для работы в контейнерах
         chrome_options.add_argument('--no-sandbox')
@@ -87,7 +87,14 @@ class SlideDownloader:
         url = url.lower()
 
         self.driver.get(url)
-        time.sleep(10)
+        # Set value in Local Storage
+        print("I AM HERE")
+        self.driver.execute_script("window.localStorage.setItem('managed-links.access-email.vk38b8', 'vin@mail.ru');")
+        print("DONE HERE")
+
+        # Refresh the page
+        self.driver.refresh()
+        time.sleep(5)
 
         pitch = False
         if 'pitch.com' in url:
