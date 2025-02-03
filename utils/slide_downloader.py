@@ -22,7 +22,7 @@ class SlideDownloader:
     def __init__(self, resolution):
 
         chrome_options = Options()
-        #chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--log-level=3')
         # Это важно для работы в контейнерах
         chrome_options.add_argument('--no-sandbox')
