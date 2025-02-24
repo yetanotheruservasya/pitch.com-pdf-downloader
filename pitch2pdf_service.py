@@ -9,6 +9,9 @@ from utils.slide_downloader import SlideDownloader
 
 app = Flask(__name__)
 
+# ставим env dev по умолчанию
+
+env = os.getenv("ENV", "dev")
 # Путь для хранения скачанных файлов
 downloads_dir = os.path.join(os.getcwd(), 'decks')
 os.makedirs(downloads_dir, exist_ok=True)
